@@ -1,0 +1,128 @@
+{
+  "name": "xhs-card-skill",
+  "version": "0.1.0",
+  "description": "Prepare and render Xiaohongshu card decks from a content brief.",
+  "deck_generation": {
+    "mode": "direct-image-deck",
+    "min_cards": 2,
+    "max_cards": 4,
+    "planner": {
+      "enabled": true,
+      "default_mode": "skill",
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "base_url_env": "DEEPSEEK_BASE_URL",
+      "model_env": "DEEPSEEK_TEXT_MODEL",
+      "default_base_url": "https://api.deepseek.com",
+      "default_model": "deepseek-v4-pro",
+      "endpoint": "/chat/completions",
+      "temperature": 0.35,
+      "fail_open": true
+    },
+    "prompt_template": "Create one finished Xiaohongshu vertical 3:4 card image. This is the final publishable image, not a background asset and not an HTML mockup. Card role: {role}. Card title: {title}. Main message: {message}. Source detail: {source_detail}. Visual direction: {visual_direction}. Use premium Chinese tech editorial design, strong hierarchy, clear focal composition, meaningful diagrams or objects when useful, polished lighting, readable simplified Chinese text, no logos, no watermark, no placeholder boxes. Make the card feel designed specifically for this topic."
+  },
+  "image_generation": {
+    "enabled": true,
+    "mode": "cover",
+    "default_provider": "volcengine-seedream",
+    "fail_on_error": true,
+    "providers": {
+      "openai-compatible": {
+        "label": "OpenAI-compatible",
+        "transport": "openai-compatible",
+        "api_key_env": "OPENAI_API_KEY",
+        "base_url_env": "OPENAI_BASE_URL",
+        "model_env": "OPENAI_IMAGE_MODEL",
+        "default_base_url": "https://api.openai.com",
+        "default_model": "gpt-image-1",
+        "endpoint": "/v1/images/generations",
+        "size": "1024x1024",
+        "quality": "medium",
+        "prompt_template": "Create a polished editorial Xiaohongshu cover visual, not a text poster. Topic: {deck_title}. Hook: {deck_hook}. Visual direction: {visual_direction}. Style: premium tech editorial, clean composition, strong focal object, realistic lighting, no visible text, no logos, no watermarks."
+      },
+      "volcengine-seedream": {
+        "label": "Volcengine Seedream",
+        "transport": "volcengine-seedream",
+        "api_key_env": "ARK_API_KEY",
+        "base_url_env": "ARK_BASE_URL",
+        "model_env": "ARK_IMAGE_MODEL",
+        "default_base_url": "https://ark.cn-beijing.volces.com/api/v3",
+        "default_model": "doubao-seedream-5-0-260128",
+        "endpoint": "/images/generations",
+        "size": "2K",
+        "output_format": "png",
+        "response_format": "b64_json",
+        "watermark": false,
+        "prompt_template": "Create a polished editorial Xiaohongshu cover visual, not a text poster. Topic: {deck_title}. Hook: {deck_hook}. Visual direction: {visual_direction}. Style: premium tech editorial, clean composition, strong focal object, realistic lighting, no visible text, no logos, no watermarks."
+      }
+    }
+  },
+  "copy_rules": {
+    "keyword_limit": 13,
+    "named_keyword_limit": 7,
+    "numeric_keyword_limit": 6,
+    "avoid_broken_latin_tokens": true,
+    "section_headings": ["机制", "证据", "价值"],
+    "stopwords": [
+      "一个",
+      "这个",
+      "如何",
+      "内容",
+      "生成",
+      "执行",
+      "模型",
+      "参数",
+      "注意力"
+    ]
+  },
+  "cta_template": "收藏这张 {lead} 卡",
+  "strategies": {
+    "default": {
+      "style": "swiss",
+      "theme": "IKB",
+      "layout_id": "S12",
+      "cover_title_template": "{lead} 关键拆解",
+      "cover_hook_template": "{number} 是关键变化",
+      "cover_visual_template": "{lead} / {secondary} 关系图"
+    },
+    "流程拆解型": {
+      "style": "swiss",
+      "theme": "IKB",
+      "layout_id": "S09",
+      "cover_title_template": "{lead} 流程拆解",
+      "cover_hook_template": "{number} 是关键变化",
+      "cover_visual_template": "{lead} / {secondary} 流程图"
+    },
+    "前后对比型": {
+      "style": "editorial",
+      "theme": "lemon",
+      "layout_id": "M05",
+      "cover_title_template": "{lead} 前后对比",
+      "cover_hook_template": "{number} 是关键变化",
+      "cover_visual_template": "{lead} 对比版式"
+    },
+    "工具实操型": {
+      "style": "swiss",
+      "theme": "forest",
+      "layout_id": "S03",
+      "cover_title_template": "{lead} 实操卡",
+      "cover_hook_template": "{secondary} 是关键动作",
+      "cover_visual_template": "{lead} 操作步骤图"
+    },
+    "结果证明型": {
+      "style": "editorial",
+      "theme": "IKB",
+      "layout_id": "M03",
+      "cover_title_template": "{lead} 结果证明",
+      "cover_hook_template": "{number} 是关键证据",
+      "cover_visual_template": "{lead} 证据卡片"
+    },
+    "系统感封面型": {
+      "style": "swiss",
+      "theme": "IKB",
+      "layout_id": "S12",
+      "cover_title_template": "{lead} 关键拆解",
+      "cover_hook_template": "{number} 是关键变化",
+      "cover_visual_template": "{lead} / {secondary} 关系图"
+    }
+  }
+}
