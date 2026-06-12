@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>小红书 Visual Agent</title>
+    <link rel="stylesheet" href="/web/styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="command-bar">
+        <div class="brand-block">
+          <span class="brand-mark">VA</span>
+          <div>
+            <h1>小红书 Visual Agent</h1>
+            <p>AI 先判定视觉策略，人负责把关和反馈。</p>
+          </div>
+        </div>
+        <div class="run-state" id="status">待生成</div>
+      </header>
+
+      <section class="brief-strip" aria-label="内容 brief">
+        <form id="plan-form" class="brief-form">
+          <label for="content-goal">内容 brief</label>
+          <textarea id="content-goal" name="content_goal" rows="4">workflow 自动化内容：我想展示如何用 AI 把小红书组图从文章提炼、排版到校验串成一个流程。</textarea>
+          <label class="provider-field" for="image-provider">
+            模型服务
+            <select id="image-provider" name="image_provider">
+              <option value="volcengine-seedream">Volcengine Seedream</option>
+              <option value="openai-compatible">OpenAI-compatible</option>
+            </select>
+          </label>
+          <button type="submit" id="generate-primary">生成方案并出图</button>
+        </form>
+      </section>
+
+      <section class="control-grid" aria-label="Visual Agent 操作台">
+        <aside class="decision-rail">
+          <h2>决策轨道</h2>
+          <ol>
+            <li class="rail-on">
+              <span>Brief</span>
+              <strong>确认内容目标</strong>
+            </li>
+            <li class="rail-on">
+              <span>Strategy</span>
+              <strong id="rail-strategy">等待推荐</strong>
+            </li>
+            <li>
+              <span>Render</span>
+              <strong id="rail-render">等待映射</strong>
+            </li>
+            <li>
+              <span>Feedback</span>
+              <strong>记录人工判断</strong>
+            </li>
+          </ol>
+        </aside>
+
+        <section class="strategy-board">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">推荐策略</span>
+              <h2 id="strategy-title">尚未生成</h2>
+            </div>
+            <span class="signal" id="strategy-signal">manual gate</span>
+          </div>
+
+          <div class="cover-card">
+            <span>封面方向</span>
+            <strong id="cover-title">-</strong>
+            <p id="cover-hook">-</p>
+            <div class="mini-flow" aria-label="视觉流程图">
+              <b>URL</b>
+              <i></i>
+              <b>提炼</b>
+              <i></i>
+              <b>卡片</b>
+              <i></i>
+              <b>校验</b>
+            </div>
+            <small id="cover-visual">-</small>
+          </div>
+
+          <div class="strategy-body">
+            <div>
+              <span class="label">推荐理由</span>
+              <p id="reason">输入内容 brief 后生成。</p>
+            </div>
+            <div>
+              <span class="label">备选方向</span>
+              <p id="alternatives">-</p>
+            </div>
+            <div class="risk-line">
+              <span class="label">风险</span>
+              <p id="risk">-</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="preview-board">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">组图预览</span>
+              <h2>Slides</h2>
+            </div>
+            <div class="action-row">
+              <button type="button" id="generate-png">生成 PNG</button>
+              <button type="button" id="copy-render">复制 JSON</button>
+            </div>
+          </div>
+          <div class="render-tags">
+            <span id="render-style">style -</span>
+            <span id="render-theme">theme -</span>
+            <span id="render-layout">layout -</span>
+            <span id="render-provider">provider -</span>
+          </div>
+          <div class="slide-strip" id="slide-strip"></div>
+        </section>
+
+        <section class="asset-board" id="asset-board">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">生成结果</span>
+              <h2>PNG Assets</h2>
+            </div>
+            <span class="asset-dir" id="asset-dir">尚未生成</span>
+          </div>
+          <div class="asset-grid" id="asset-grid"></div>
+        </section>
+
+        <details class="json-board">
+          <summary>
+            <span>
+              <span class="eyebrow">渲染输入</span>
+              <strong>Payload JSON</strong>
+            </span>
+            <span>展开</span>
+          </summary>
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">渲染输入</span>
+              <h2>Payload</h2>
+            </div>
+          </div>
+          <pre id="render-json">{}</pre>
+        </details>
+
+        <section class="check-board">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">人工检查</span>
+              <h2>Checkpoints</h2>
+            </div>
+          </div>
+          <ul id="checkpoints"></ul>
+        </section>
+
+        <form class="feedback-board" id="feedback-form">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">反馈记录</span>
+              <h2>Post Review</h2>
+            </div>
+            <button type="submit">写入反馈</button>
+          </div>
+          <div class="feedback-grid">
+            <label>
+              帖子 ID
+              <input id="post-id" name="post_id" value="post-001">
+            </label>
+            <label>
+              主题
+              <input id="topic" name="topic" value="workflow post">
+            </label>
+            <label>
+              曝光
+              <input id="views" name="views" type="number" min="0" value="0">
+            </label>
+            <label>
+              点赞
+              <input id="likes" name="likes" type="number" min="0" value="0">
+            </label>
+            <label>
+              收藏
+              <input id="saves" name="saves" type="number" min="0" value="0">
+            </label>
+            <label>
+              评论
+              <input id="comments" name="comments" type="number" min="0" value="0">
+            </label>
+          </div>
+          <label for="human-notes">人工判断</label>
+          <textarea id="human-notes" name="human_notes" rows="4">收藏率待观察，封面需要更直给。</textarea>
+          <p id="feedback-result">反馈会写入 docs/memories/帖子表现记录.jsonl</p>
+        </form>
+      </section>
+    </main>
+
+    <script src="/web/app.js"></script>
+  </body>
+</html>
