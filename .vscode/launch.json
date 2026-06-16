@@ -1,0 +1,77 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Visual Agent: Web UI",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "console": "integratedTerminal",
+      "args": [
+        "--mode",
+        "web",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8765"
+      ],
+      "justMyCode": true
+    },
+    {
+      "name": "Visual Agent: visual-plan",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "console": "integratedTerminal",
+      "args": [
+        "--url",
+        "https://news.qq.com/rain/a/20260612A069T900",
+        "--mode",
+        "visual-plan"
+      ],
+      "justMyCode": true
+    },
+    {
+      "name": "Visual Agent: render-input",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "console": "integratedTerminal",
+      "args": [
+        "--input",
+        "workflow 自动化内容：把文章提炼、排版和校验串成小红书组图流水线",
+        "--mode",
+        "render-input"
+      ],
+      "justMyCode": true
+    },
+    {
+      "name": "Visual Agent: render-deck",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "console": "integratedTerminal",
+      "args": [
+        "--input",
+        "workflow 自动化内容：把文章提炼、排版和校验串成小红书组图流水线",
+        "--mode",
+        "render-deck"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "Tests: unittest",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "unittest",
+      "console": "integratedTerminal",
+      "args": [
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "justMyCode": true
+    }
+  ]
+}
