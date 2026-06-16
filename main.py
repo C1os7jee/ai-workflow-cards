@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 from agent.agent import VisualAgent
@@ -13,9 +14,10 @@ from agent.web_app import run as run_web_app
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="ai-workflow-cards Visual Agent")
     parser.add_argument("--input", help="content goal or brief text")
+    parser.add_argument("--url", help="URL to fetch and convert into a content brief")
     parser.add_argument(
         "--mode",
-        choices=["visual-plan", "render-input", "record-feedback", "web"],
+        choices=["visual-plan", "render-input", "render-deck", "record-feedback", "web"],
         default="visual-plan",
         help="output mode",
     )
@@ -46,17 +48,20 @@ def _load_metrics(metrics_json: str):
 
 
 def main() -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     parser = build_parser()
     args = parser.parse_args()
     if args.mode == "web":
         run_web_app(host=args.host, port=args.port)
         return 0
 
-    if not args.input:
-        parser.error("--input is required unless --mode web is used")
+    content_input = args.url or args.input
+    if not content_input:
+        parser.error("--input or --url is required unless --mode web is used")
 
     agent = VisualAgent()
-    plan = agent.generate_plan(args.input)
+    plan = agent.generate_plan(content_input)
 
     if args.mode == "visual-plan":
         print(json.dumps(plan.to_dict(), ensure_ascii=False, indent=2))
@@ -65,6 +70,11 @@ def main() -> int:
     if args.mode == "render-input":
         payload = agent.to_render_payload(plan)
         print(json.dumps(payload, ensure_ascii=False, indent=2))
+        return 0
+
+    if args.mode == "render-deck":
+        result = agent.generate_deck(plan)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
 
     if not args.post_id or not args.topic or not args.human_notes:

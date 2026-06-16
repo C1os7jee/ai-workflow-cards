@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Dict, Optional
 
 from agent.schemas import FeedbackRecord, VisualPlan, VisualCoverDirection
+from agent.tools import extract
+from agent.tools import fetch
 from agent.tools.layouts import get_strategy_preset, list_supported_strategies
 from agent.tools.render import (
     build_render_input,
@@ -24,6 +26,8 @@ class VisualAgent:
         image_provider: str = "",
         planner_mode: str = "",
     ) -> VisualPlan:
+        if fetch.is_url(content_goal):
+            content_goal = extract.extract_article_brief(fetch.brief_from_url(content_goal))
         strategy = self._choose_strategy(content_goal)
         preset = get_strategy_preset(strategy)
         prepared = prepare_render_plan(
