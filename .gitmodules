@@ -1,0 +1,3 @@
+[submodule "skills/guizang-social-card-skill"]
+	path = skills/guizang-social-card-skill
+	url = https://github.com/op7418/guizang-social-card-skill
