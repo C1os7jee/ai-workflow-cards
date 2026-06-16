@@ -8,6 +8,8 @@ import sys
 from pathlib import Path
 
 from agent.agent import VisualAgent
+from agent.schemas import RenderInput, RenderSlide
+from agent.tools.render import _build_deck_html
 
 
 SKILL_PREPARE_PATH = Path(__file__).resolve().parents[1] / "skills" / "xhs-card-skill" / "prepare_payload.py"
@@ -27,6 +29,68 @@ _render_spec.loader.exec_module(_render_module)
 
 
 class RenderTests(unittest.TestCase):
+    def test_guizang_s09_uses_recipe_dom_instead_of_generic_cards(self):
+        render_input = RenderInput(
+            style="swiss",
+            theme="IKB",
+            layout_id="S09",
+            visual_direction="中心流程图 + 关键节点高亮",
+            visual_blueprint={"strategy": "流程拆解型"},
+            slides=[
+                RenderSlide(type="cover", title="Hermes Agent", hook="5 步配置 AI 智能体"),
+                RenderSlide(
+                    type="content",
+                    heading="关键变化",
+                    points=["网页端一站式创建智能体角色", "关联 Hermes Agent"],
+                ),
+                RenderSlide(
+                    type="content",
+                    heading="怎么做到",
+                    points=["配置流程被压缩成 5 个步骤", "模型技能 MCP 统一配置"],
+                ),
+                RenderSlide(type="cta", text="保存这张卡"),
+            ],
+        ).validate()
+
+        html = _build_deck_html(render_input)
+
+        self.assertIn('class="kpi-tower-row"', html)
+        self.assertIn('class="bar-tower"', html)
+        self.assertIn("S06 · Pipeline", html)
+        self.assertIn('class="hero-stat-bottom"', html)
+        self.assertNotIn('<div class="grid cols-1 gap-5">', html)
+
+    def test_guizang_s12_uses_matrix_and_ledger_recipe_dom(self):
+        render_input = RenderInput(
+            style="swiss",
+            theme="forest",
+            layout_id="S12",
+            visual_direction="模块关系图 + 层级结构",
+            visual_blueprint={"strategy": "系统感封面型"},
+            slides=[
+                RenderSlide(type="cover", title="内容系统", hook="持续进化的结构"),
+                RenderSlide(
+                    type="content",
+                    heading="能力矩阵",
+                    points=["账号定位", "视觉策略", "反馈记录"],
+                ),
+                RenderSlide(
+                    type="content",
+                    heading="证据保留",
+                    points=["render input", "image prompts", "PNG 路径"],
+                ),
+                RenderSlide(type="cta", text="保存这套流程"),
+            ],
+        ).validate()
+
+        html = _build_deck_html(render_input)
+
+        self.assertIn('class="matrix-fill"', html)
+        self.assertIn('class="matrix-cell is-accent"', html)
+        self.assertIn('class="stacked-ledger"', html)
+        self.assertIn('class="ledger-icn"', html)
+        self.assertIn('class="hero-stat-bottom"', html)
+
     def test_render_payload_contains_valid_cover_and_cta(self):
         plan = VisualAgent().generate_plan("workflow 自动化内容")
         payload = VisualAgent().to_render_payload(plan)
@@ -69,6 +133,28 @@ class RenderTests(unittest.TestCase):
         text = str(payload)
 
         self.assertIn("28.4", text)
+
+    def test_structured_brief_drives_cover_and_slide_copy(self):
+        brief = (
+            "来源 URL：https://news.qq.com/rain/a/20260612A069T900\n"
+            "标题：Hermes Agent 上线 Profile Builder，5 步配置 AI 智能体\n"
+            "主题：Hermes Agent 上线 Profile Builder，5 步配置 AI 智能体\n"
+            "核心钩子：5 步配置 AI 智能体\n"
+            "关键点：网页端一站式创建智能体角色 / 配置流程被压缩成 5 个步骤 / "
+            "模型、技能和 MCP 统一配置 / 技能以 SKILL.md 形式按需加载\n"
+            "关键实体：Hermes Agent / Profile Builder / Nous Research / MCP / Skills Hub / SKILL.md\n"
+            "关键数字：5 步 / 2026 / 06 / 12\n"
+            "受众角度：AI 工具玩家 / 内容创作者"
+        )
+        plan = VisualAgent().generate_plan(brief)
+        payload = VisualAgent().to_render_payload(plan)
+        cover = payload["slides"][0]
+        slide_text = str(payload["slides"])
+
+        self.assertNotEqual(cover["title"], "8分钟生成组图")
+        self.assertIn("5 步配置", cover["hook"])
+        self.assertIn("网页端一站式", slide_text)
+        self.assertIn("模型、技能和 MCP", slide_text)
 
     def test_skill_config_controls_cover_copy(self):
         config = {
