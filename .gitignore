@@ -4,6 +4,11 @@
 
 output/
 
+agent_state.db
+agent_state/
+news_rewriter_state/
+logs/
+
 __pycache__/
 *.py[cod]
 .pytest_cache/
